@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.net.Socket;
 
 import static android.content.Context.WIFI_SERVICE;
@@ -17,6 +18,8 @@ import static android.content.Context.WIFI_SERVICE;
 public class ConnectToSocketServer {
     private static final String LOG_TAG = ConnectToSocketServer.class.getSimpleName();
     private ChatActivity chatActivity;
+    private static final String ipReceiver = "192.168.0.101";
+    private static final String ipSendor = "192.168.0.107";
 
     public ConnectToSocketServer(ChatActivity chatActivity) {
         this.chatActivity = chatActivity;
@@ -36,12 +39,14 @@ public class ConnectToSocketServer {
                 try {
                     //Replace below IP with the IP of that device in which server socket open.
                     //If you change port then change the port number in the server side code also.
-                    Socket s = new Socket(ipAddress, 9002);
+                    InetAddress host = InetAddress.getLocalHost();
+                    Log.i(LOG_TAG, "host, "  + host);
+                    Log.i(LOG_TAG, "ipAddress, " + host.getHostName());
+                    Socket s = new Socket(ipReceiver, 9002);
                     Log.i(LOG_TAG, "s socket, " + s);
                     OutputStream out = s.getOutputStream();
 
                     PrintWriter output = new PrintWriter(out);
-
                     output.println(message);
                     output.flush();
                     BufferedReader input = new BufferedReader(new InputStreamReader(s.getInputStream()));
@@ -69,6 +74,7 @@ public class ConnectToSocketServer {
 
     private String getIpAddress() {
         WifiManager wm = (WifiManager)chatActivity.getApplicationContext().getSystemService(WIFI_SERVICE);
+        assert wm != null;
         String ip = Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
         return  ip;
     }

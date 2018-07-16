@@ -39,4 +39,9 @@ public class ChatActivity extends AppCompatActivity implements ChatMessageInterf
          recyclerViewPresenter.connectToSocketServer(this, message);
          recyclerViewPresenter.sendMessageToAdapter(message, true);
     }
+
+    @Override
+    public void receiveMessage(String message) {
+        recyclerViewPresenter.sendMessageToAdapter(message, false);
+    }
 }

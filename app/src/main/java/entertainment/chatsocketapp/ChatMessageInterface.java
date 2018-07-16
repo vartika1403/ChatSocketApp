@@ -1,6 +1,7 @@
 package entertainment.chatsocketapp;
 
 public interface ChatMessageInterface {
-    public void sendMessage(String message);
+    void sendMessage(String message);
+    void receiveMessage(String message);
 
 }

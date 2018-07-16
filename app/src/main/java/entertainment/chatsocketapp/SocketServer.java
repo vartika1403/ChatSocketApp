@@ -1,46 +1,38 @@
 package entertainment.chatsocketapp;
 
-import android.content.pm.PackageInstaller;
 import android.os.Handler;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.URLDecoder;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class SocketServer {
-    final Handler handler = new Handler();
-    boolean flag = true;
+    private static final String LOG_TAG = SocketServer.class.getSimpleName();
+    private final Handler handler = new Handler();
+    private boolean flag = true;
 
-    public void startServerSocket() {
+    public void startServerSocket(final ChatMessageInterface chatMessageInterface) {
 
         Thread thread = new Thread(new Runnable() {
-
             private String stringData = null;
 
             @Override
             public void run() {
-
                 try {
-
                     ServerSocket ss = new ServerSocket(9002);
-
                     while (flag) {
                         //Server is waiting for client here, if needed
                         Socket s = ss.accept();
+                        Log.i(LOG_TAG, "server s, " + s);
                         BufferedReader input = new BufferedReader(new InputStreamReader(s.getInputStream()));
                         PrintWriter output = new PrintWriter(s.getOutputStream());
 
                         stringData = input.readLine();
+                        Log.i(LOG_TAG, "string received by server, " + stringData);
                         output.println("FROM SERVER - " + stringData.toUpperCase());
                         output.flush();
 
@@ -49,7 +41,7 @@ public class SocketServer {
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                        updateUI(stringData);
+                        updateUI(stringData, chatMessageInterface);
                         if (stringData.equalsIgnoreCase("STOP")) {
                             flag = false;
                             output.close();
@@ -70,15 +62,17 @@ public class SocketServer {
         thread.start();
     }
 
-    private void updateUI(final String stringData) {
+    private void updateUI(final String stringData, final ChatMessageInterface chatMessageInterface) {
+
 
         handler.post(new Runnable() {
             @Override
             public void run() {
 
-               /* String s = textViewDataFromClient.getText().toString();
-                if (stringData.trim().length() != 0)
-                    textViewDataFromClient.setText(s + "\n" + "From Client : " + stringData);*/
+                if (!stringData.isEmpty()) {
+                    chatMessageInterface.receiveMessage(stringData);
+                }
+
             }
         });
     }

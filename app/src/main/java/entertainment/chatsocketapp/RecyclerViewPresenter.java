@@ -6,6 +6,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import entertainment.chatsocketapp.adapter.MessageAdapter;
 import entertainment.chatsocketapp.model.ChatUser;
 
 public class RecyclerViewPresenter implements RecyclerViewPresenterInterface {
+    private static final String LOG_TAG = RecyclerViewPresenter.class.getSimpleName();
     private List<ChatUser> chatUsersList;
     private MessageAdapter messageAdapter;
     private ChatMessageInterface chatMessageInterface;
@@ -43,15 +45,16 @@ public class RecyclerViewPresenter implements RecyclerViewPresenterInterface {
 
     @Override
     public void sendMessageToAdapter(String message, boolean isSelf) {
-     ChatUser chatUser = new ChatUser("me", message, true);
+     ChatUser chatUser = new ChatUser("me", message, isSelf);
      chatUsersList.add(chatUser);
      messageAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void startServer(){
+        Log.i(LOG_TAG, "server start");
         SocketServer socketServer = new SocketServer();
-        socketServer.startServerSocket();
+        socketServer.startServerSocket(chatMessageInterface);
     }
 
     @Override
